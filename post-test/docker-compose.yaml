@@ -1,0 +1,161 @@
+version: '3'
+services:
+  db_01:
+    image: postgres:16.0
+    container_name: postgres1
+    environment:
+      POSTGRES_USER: postgres1
+      POSTGRES_PASSWORD: postgres1
+      POSTGRES_DB: postgres1
+    volumes:
+      - ./database1/merchant-table.sql:/docker-entrypoint-initdb.d/1.sql
+      - ./database1/merchant-data.sql:/docker-entrypoint-initdb.d/2.sql
+      - ./database1/pet-table.sql:/docker-entrypoint-initdb.d/3.sql
+      - ./database1/pet-data.sql:/docker-entrypoint-initdb.d/4.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  db_02:
+    image: postgres:16.0
+    container_name: postgres2
+    environment:
+      POSTGRES_USER: postgres2
+      POSTGRES_PASSWORD: postgres2
+      POSTGRES_DB: postgres2
+    volumes:
+      - ./database2/user-table.sql:/docker-entrypoint-initdb.d/1.sql
+      - ./database2/user-data.sql:/docker-entrypoint-initdb.d/2.sql
+      - ./database2/food-table.sql:/docker-entrypoint-initdb.d/3.sql
+      - ./database2/food-data.sql:/docker-entrypoint-initdb.d/4.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+# version: '3'
+# services:
+#   db_01:
+#     image: postgres:16.0
+#     container_name: postgres1
+#     environment:
+#       POSTGRES_USER: postgres1
+#       POSTGRES_PASSWORD: postgres1
+#       POSTGRES_DB: postgres1
+#     volumes:
+#       - ./database1/merchant-table.sql:/docker-entrypoint-initdb.d/1.sql
+#       - ./database1/merchant-data.sql:/docker-entrypoint-initdb.d/2.sql
+#       - ./database1/pet-table.sql:/docker-entrypoint-initdb.d/3.sl
+#       - ./database1/pet-data.sql:/docker-entrypoint-initdb.d/4.sql
+#     healthcheck:
+#       test: ["CMD-SHELL", "pg_isready", "-d", "postgres"]
+#       interval: 5s
+#       timeout: 5s
+#       retries: 5
+#       start_period: 5s
+
+#   db_02:
+#     image: postgres:16.0
+#     container_name: postgres2
+#     environment:
+#       POSTGRES_USER: postgres2
+#       POSTGRES_PASSWORD: postgres2
+#       POSTGRES_DB: postgres2
+#     volumes:
+#       - ./database2/user-table.sql:/docker-entrypoint-initdb.d/1.sql
+#       - ./database2/user-data.sql:/docker-entrypoint-initdb.d/2.sql
+#       - ./database2/food-table.sql:/docker-entrypoint-initdb.d/3.sl
+#       - ./database2/food-data.sql:/docker-entrypoint-initdb.d/4.sql
+#     healthcheck:
+#       test: ["CMD-SHELL", "pg_isready", "-d", "postgres"]
+#       interval: 5s
+#       timeout: 5s
+#       retries: 5
+#       start_period: 5s
+
+  backend1:
+    image: backend1:1.0
+    container_name: backend1
+    environment:
+      NODE_TLS_REJECT_UNAUTHORIZED: 0
+      DB1_HOST: db_01
+      DB1_NAME: postgres1
+      DB1_USER: postgres1
+      DB1_PASSWORD: postgres1
+      DB2_HOST: db_02
+      DB2_NAME: postgres2
+      DB2_USER: postgres2
+      DB2_PASSWORD: postgres2
+    build: 
+      context: backend1
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:3000 || exit 1
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    depends_on:
+      db_01:
+        condition: service_healthy
+      db_02:
+        condition: service_healthy
+
+  backend2:
+    image: backend2:1.0
+    container_name: backend2
+    environment:
+      DB1_HOST: db_01
+      DB1_NAME: postgres1
+      DB1_USER: postgres1
+      DB1_PASSWORD: postgres1
+      DB2_HOST: db_02
+      DB2_NAME: postgres2
+      DB2_USER: postgres2
+      DB2_PASSWORD: postgres2
+    build: 
+      context: backend2
+      dockerfile: Dockerfile
+    ports:
+      - 3001:3001
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:3001 || exit 1
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    depends_on:
+      db_01:
+        condition: service_healthy
+      db_02:
+        condition: service_healthy
+
+
+  backend_test:
+    container_name: backend-test
+    build: 
+      context: backend-testing
+      dockerfile: Dockerfile
+    volumes:
+      - ./backend-testing/report:/etc/newman/reports
+    
+
+  mock_api:
+    image: mock-api:latest
+    container_name: mock-api
+    build: 
+      context: mountebank
+      dockerfile: Dockerfile
+    volumes:
+      - ./mountebank/imposters:/imposters
+    ports:
+      - 2525:2525
+      - 8090:8090
+    command: --configfile /imposters/imposters.ejs --allowInjection
+

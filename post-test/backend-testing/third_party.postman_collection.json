@@ -1,0 +1,93 @@
+{
+	"info": {
+		"_postman_id": "adc26602-8267-44cd-b2b1-5ff58ff00580",
+		"name": "Third party",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34784294",
+		"_collection_link": "https://speeding-space-165079.postman.co/workspace/Team-Workspace~cc11f80e-2e95-48e9-8765-5b3bdeffc24e/collection/34784294-adc26602-8267-44cd-b2b1-5ff58ff00580?action=share&source=collection_link&creator=34784294"
+	},
+	"item": [
+		{
+			"name": "3rd party",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Schema is valid\", function () {",
+							"  var schema = {",
+							"    type: \"array\",",
+							"    items: {",
+							"      type: \"object\",",
+							"      properties: {",
+							"        id: { type: \"number\" },",
+							"        name: { type: \"string\" },",
+							"        username: { type: \"string\" },",
+							"        email: { type: \"string\", format: \"email\" },",
+							"        address: {",
+							"          type: \"object\",",
+							"          properties: {",
+							"            street: { type: \"string\" },",
+							"            suite: { type: \"string\" },",
+							"            city: { type: \"string\" },",
+							"            zipcode: { type: \"string\" },",
+							"            geo: {",
+							"              type: \"object\",",
+							"              properties: {",
+							"                lat: { type: \"string\" },",
+							"                lng: { type: \"string\" },",
+							"              },",
+							"              required: [\"lat\", \"lng\"]",
+							"            }",
+							"          },",
+							"          required: [\"street\", \"suite\", \"city\", \"zipcode\", \"geo\"]",
+							"        },",
+							"        phone: { type: \"string\" },",
+							"        website: { type: \"string\" },",
+							"        company: {",
+							"          type: \"object\",",
+							"          properties: {",
+							"            name: { type: \"string\" },",
+							"            catchPhrase: { type: \"string\" },",
+							"            bs: { type: \"string\" }",
+							"          },",
+							"          required: [\"name\", \"catchPhrase\", \"bs\"]",
+							"        }",
+							"      },",
+							"      required: [\"id\", \"name\", \"username\", \"email\", \"address\", \"phone\", \"website\", \"company\"]",
+							"    }",
+							"  };",
+							"",
+							"  var response = pm.response.json();",
+							"  pm.expect(tv4.validate(response, schema)).to.be.true;",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://backend1:3000/thirdParty/users",
+					"protocol": "http",
+					"host": [
+						"backend1"
+					],
+					"port": "3000",
+					"path": [
+						"thirdParty",
+						"users"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

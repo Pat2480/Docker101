@@ -1,0 +1,102 @@
+version: '3'
+services:
+  web:
+    image: pat2480/demo:3.0
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: nginx-demo
+    ports:
+      - 7777:80
+# PostGresDB
+  db:
+    image: postgres-demo
+    build:
+      context: ./postgres
+      dockerfile: Dockerfile
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+      THIRD_PARTY_SERVICE: http://mountebank/uygugu
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  # db2:
+  #   image: postgres:16.0
+  #   container_name: postgres2
+  #   environment:
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: postgres
+  #     POSTGRES_DB: postgres
+  #   volumes:
+  #     - ./postgres/table.sql:/docker-entrypoint-initdb.d/1.sql
+  #     - ./postgres/data.sql:/docker-entrypoint-initdb.d/2.sql
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready", "-d", "postgres"]
+  #     interval: 5s
+  #     timeout: 5s
+  #     retries: 5
+  #     start_period: 5s
+
+  backend:
+    image: backend:1.0
+    build: 
+      context: backend
+      dockerfile: Dockerfile
+    container_name: backend-demo
+    ports:
+      - 3000:3000
+    environment:
+      DB_HOST: db
+      DB_NAME: postgres
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:3000 || exit 1
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    image: frontend:1.0
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    container_name: frontend-demo
+    ports:
+      - 8888:80
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  backend_test:
+    image: backend-test:1.0
+    build: 
+      context: backend-testing
+      dockerfile: Dockerfile
+    volumes:
+      - ./backend-testing/report:/etc/newman/newman
+    
+  mock_api:
+    image: mock-api:1.0
+    container_name: mock-api
+    build:
+      context: ./mountebank
+      dockerfile: ./Dockerfile
+    ports:
+      - 2525:2525
+      - 8090:8090
+      - 8091:8091
+    command: --configfile /imposters/imposters.ejs --allowInjection
+    volumes:
+      - ./mountebank/imposters:/imposters
