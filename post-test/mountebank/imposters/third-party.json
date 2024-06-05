@@ -20,9 +20,11 @@
                     "is": {
                         "statusCode": 200,
                         "headers": {
-                            "Content-Type": "application/json"
+                            "Content-type": "application/json"
                         },
-                        "body": [
+                        "body":
+
+                        [
                             {
                                 "id": 1,
                                 "name": "Leanne Graham",
@@ -70,9 +72,11 @@
                                 }
                             }
                         ]
+
+                        }
                     }
-                }
+                
             ]
         }
     ]
-}
+}   

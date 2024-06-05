@@ -90,13 +90,14 @@ services:
       DB2_NAME: postgres2
       DB2_USER: postgres2
       DB2_PASSWORD: postgres2
+      THIRD_PARTY_SERVICE: https://mock_api:8090/users
     build: 
       context: backend1
       dockerfile: Dockerfile
     ports:
       - 3000:3000
     healthcheck:
-      test: wget --no-verbose --tries=1 --spider http://localhost:3000 || exit 1
+      test: wget --no-verbose --tries=1 --spider http://localhost:3000/users || exit 1
       interval: 5s
       timeout: 5s
       retries: 5
@@ -124,8 +125,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - 3001:3001
-    healthcheck:
-      test: wget --no-verbose --tries=1 --spider http://localhost:3001 || exit 1
+    healthcheck:  
+      test: wget --no-verbose --tries=1 --spider http://localhost:3001/pets || exit 1
       interval: 5s
       timeout: 5s
       retries: 5

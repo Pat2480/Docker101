@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Backend1" tests="2" time="0.086">
+  <testsuite name="Get user" id="f3c87728-42b5-40a2-b9e0-9d74ad9b1adf" timestamp="2024-06-05T03:26:00.580Z" tests="2" failures="0" errors="0" time="0.073">
+    <testcase name="Status code is 200" time="0.073" classname="Backend1"/>
+    <testcase name="Schema is valid" time="0.073" classname="Backend1"/>
+  </testsuite>
+  <testsuite name="Get merchant" id="bf6745dc-51b2-45d8-9e91-17904a7f2117" timestamp="2024-06-05T03:26:00.580Z" tests="2" failures="0" errors="0" time="0.013">
+    <testcase name="Status code is 200" time="0.013" classname="Backend1"/>
+    <testcase name="Schema is valid" time="0.013" classname="Backend1"/>
+  </testsuite>
+</testsuites>

@@ -24,3 +24,11 @@ do
 done
 chmod -R o+rwx ./reports
 exit $status_all
+
+# echo "test"
+# ls
+
+# newman run ./backend1.postman_collection.json\
+#     -k -r htmlextra,cli,junit \
+#     --reporter-htmlextra-export="reports/report_1.html" \
+#     --reporter-junit-export="reports/junitReport_1.xml"

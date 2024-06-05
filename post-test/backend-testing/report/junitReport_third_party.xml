@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Third party" tests="1" time="0.173">
+  <testsuite name="3rd party" id="52f4f5f8-3da1-4377-a2cc-616e64b4afca" timestamp="2024-06-05T03:26:03.432Z" tests="2" failures="0" errors="0" time="0.173">
+    <testcase name="Status code is 200" time="0.173" classname="ThirdParty"/>
+    <testcase name="Schema is valid" time="0.173" classname="ThirdParty"/>
+  </testsuite>
+</testsuites>
